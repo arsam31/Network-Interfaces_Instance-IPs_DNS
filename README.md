@@ -89,3 +89,71 @@ inside the OS, it has no visibility on the network configuration of public IP ad
 Important: You NEVER configure a network interface inside an operating system with a public IPv4 address inside AWS
 
 The public DNS which is given to the instance for the public IPv4 address,this will resolve to primary IPv4 address from within the VPC, and this is done so that if you have got instance-to-instance communication,using the address inside the VPC,it never leaves VPC
+
+
+
+## Amazon Machine Images (AMI)
+
+When we launch an ec2 instance, we are actually using aws AMI to launch an instance through aws console UI
+
+There are also customer provided AMIs that includes commercial softwares. In that type of case, we pay for the normal instance price plus extra amount for the commercial software
+
+AMIs are regional, we can have different AMIs for same things in different region with unique IDs.
+
+AMIs also include permissions:
+
+1: Only your account can use them 
+
+2: Only specific accounts can use them 
+
+3: Everyone can use them
+
+We can create instances from AMI
+
+We can do the reverse, create AMI from an instance to capture the current configuration of that instance and then create many instances from that AMI
+
+LifeCycle of AMI has 4 phases:
+
+1: Launch :- this step is the one that we normally do when launching an instance from AWS console. EBS volumes are attached to instances using block device IDs
+
+Boot volume are usually "dev/xvda"
+
+Data volumes are usually "dev/xvdf"
+
+These both are device IDs and this is how EBS volume is presented to an instance
+
+2: Configure : - When the instance is in launch phase you can do some customization according to your need and launch it. 
+
+3: Create Image : - Then make AMI of that particular instance 
+
+4: Launch : - And launch many more instances according to your need
+
+Think of AMI as a container. It is logical container which has associated information. It's got an ID and permissions who can use it.
+
+The important part is when you create an AMI of an istance,the EBS volume that are attached to it, we take snapshots of that EBS volumes. Remember the first snapshot is the complete copy of your data, and onwards the snapshots are INCREMENTAL(when we change some thing in the volume,only that part is taken and added in the snapshot)
+
+When we make an AMI the first thing that happen is the snapshots of the volume. These snapshots are referenced as Block Device Mapping in the AMI.
+
+Block device mapping is just a table of data. It links snapshot Ids you have just created from volume(xvda,xvdf) and map those IDs to the AMI
+
+Now what this mean is, when we use this AMI to create an instance, the instance will have the same EBS volume configuration as the original.
+
+When you launch the instance using AMI, what actually happen is the EBS volume is created in the same AZ you are launching the instance into, and those volumes are attached to that new instance, using the same device IDs that it contained in that Block Device Mapping.
+
+
+
+IMPORTANT Points:-   AMIs are regional service, it means we can make instances in all AZs in the same region using that AMI but can not make instance in another region
+
+BUT what we can do is COPY the AMI in another region first. and then launch instance from that newly copied AMI.
+
+AMI BAKING is a term which means taking an instance, isntalling all the desired softwares,changing configurations and then baking all that into AMI.
+
+AMI can not be edited. If you want to edit it and change the configuration, then you must launch an instance and during launch phase change the configuraion and then create a brand new AMI of the instance. You can not edit existing AMI
+
+Default permission on AMI is,it's only accessable with in your account, but we can change parameters (public, your account,specific accounts)
+
+AMI does have a cost for the snapshots of EBS volume. Remember we are charged for how much data is stored in the volume NOT the total allocated size of volume
+
+
+
+
