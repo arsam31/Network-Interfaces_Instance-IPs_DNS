@@ -157,3 +157,5 @@ AMI does have a cost for the snapshots of EBS volume. Remember we are charged fo
 
 
 
+
+
